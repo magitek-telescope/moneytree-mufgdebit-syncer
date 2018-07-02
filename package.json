@@ -1,9 +1,11 @@
 {
   "dependencies": {
     "delay": "^3.0.0",
+    "prettier": "^1.13.7",
     "puppeteer": "^1.5.0"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "format": "prettier --write index.js"
   }
 }
