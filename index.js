@@ -9,7 +9,9 @@ const {
   TARGET_MONTH
 } = process.env
 
-async function main() {
+let result = [['ID', '用途', '金額', '日付']]
+
+async function scrapingFromMUFG() {
   const browser = await puppeteer.launch({ headless: false })
   let pages, page, isEnded
 
@@ -35,7 +37,6 @@ async function main() {
   await page.select('[name="W031301.referenceDate"]', TARGET_MONTH)
   await delay(1000)
 
-  let result = [['ID', '用途', '金額', '日付']]
   while (!isEnded) {
     result.push(...(await page.evaluate(async () => {
       let cols = []
@@ -62,4 +63,12 @@ async function main() {
   await browser.close();
 }
 
-main()
+async function postToMoneyTree() {
+
+}
+
+
+;(async () => {
+  await scrapingFromMUFG()
+  await postToMoneyTree()
+})()
