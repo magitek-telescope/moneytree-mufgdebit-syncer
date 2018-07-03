@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "axios": "^0.18.0",
     "delay": "^3.0.0",
     "prettier": "^1.13.7",
     "puppeteer": "^1.5.0"

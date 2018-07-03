@@ -9,7 +9,7 @@ const {
   TARGET_MONTH
 } = process.env;
 
-let result = [["ID", "用途", "金額", "日付"]];
+let result = {};
 
 async function scrapingFromMUFG() {
   const browser = await puppeteer.launch({ headless: false });
@@ -40,27 +40,17 @@ async function scrapingFromMUFG() {
   await delay(1000);
 
   while (!isEnded) {
-    result.push(
-      ...(await page.evaluate(async () => {
-        let cols = [];
-        document.querySelectorAll(".lyt-sp-none .tbl-02 tbody").forEach(col => {
-          cols.push(
-            [
-              `VISA-${col.querySelector("td:nth-of-type(9)").innerHTML}`,
-              `${col.querySelector("td:nth-of-type(2)").innerHTML}`,
-              `${col
-                .querySelector("td:nth-of-type(3)")
-                .innerHTML.replace(/ /g, "")}`,
-              `${col.querySelector("td:nth-of-type(1)").innerHTML}`
-            ]
-              .join(",")
-              .replace(/&nbsp;/g, "&")
-              .replace(/\n/g, "")
-          );
-        });
-        return cols;
-      }))
-    );
+    result = {...result, ...(await page.evaluate(async () => {
+      cols = {}
+      document.querySelectorAll(".lyt-sp-none .tbl-02 tbody").forEach(col => {
+        cols[`VISA-${col.querySelector("td:nth-of-type(9)").innerHTML}`] = {
+          description_guest: `${col.querySelector("td:nth-of-type(2)").innerHTML}`,
+          amount: -`${col.querySelector("td:nth-of-type(3)").innerHTML.replace(/ /g, "")}`,
+          date: `${col.querySelector("td:nth-of-type(1)").innerHTML}T00:00:00+09:00`
+        }
+      });
+      return cols;
+    }))}
     isEnded = await page.evaluate(() => {
       return document
         .querySelector(".nablarch_nextSubmit")
@@ -72,7 +62,6 @@ async function scrapingFromMUFG() {
       await delay(500);
     }
   }
-  console.log(result.join("\n"));
   await browser.close();
 }
 
@@ -80,5 +69,6 @@ async function postToMoneyTree() {}
 
 (async () => {
   await scrapingFromMUFG();
+  console.log(JSON.stringify(result));
   await postToMoneyTree();
 })();
