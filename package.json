@@ -2,11 +2,16 @@
   "dependencies": {
     "axios": "^0.18.0",
     "delay": "^3.0.0",
+    "moment": "^2.22.2",
     "prettier": "^1.13.7",
     "puppeteer": "^1.5.0"
   },
   "scripts": {
-    "start": "node index.js",
-    "format": "prettier --write index.js"
+    "start": "node src/index.js > data.json;node src/post,js",
+    "format": "prettier --write src/*.js"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
   }
 }

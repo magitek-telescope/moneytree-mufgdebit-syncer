@@ -3,16 +3,12 @@ const querystring = require('querystring')
 const dump = require('./data.json')
 const delay = require('delay')
 
-const {
-  MONEYTREE_TOKEN,
-  MONEYTREE_APIKEY,
-} = process.env
+const { MONEYTREE_TOKEN, MONEYTREE_APIKEY } = process.env
 
 axios.defaults.baseURL = 'https://jp-api.getmoneytree.com/v8/api'
 axios.defaults.headers['X-API-KEY'] = MONEYTREE_APIKEY
 axios.defaults.headers['X-API-version'] = 6
 axios.defaults.headers['authorization'] = `Bearer ${MONEYTREE_TOKEN}`
-
 ;(async () => {
   const params = {
     category_id: 85,
@@ -25,17 +21,23 @@ axios.defaults.headers['authorization'] = `Bearer ${MONEYTREE_TOKEN}`
     page: 0,
     per_page: 25
   }
-  const { data } = await axios.get(`/web/presenter/transactions.json?${querystring.stringify(params)}`)
+  const { data } = await axios.get(
+    `/web/presenter/transactions.json?${querystring.stringify(params)}`
+  )
   const transactions = []
   let count = data.transaction_details.transactions_count
-  while(count > 0) {
+  while (count > 0) {
     params.page = params.page + 1
-    var res = await axios.get(`/web/presenter/transactions.json?${querystring.stringify(params)}`)
+    var res = await axios.get(
+      `/web/presenter/transactions.json?${querystring.stringify(params)}`
+    )
     transactions.push(...res.data.transactions)
     count -= 25
   }
   await Object.entries(dump).map(async ([key, value]) => {
-    const t = transactions.find((transaction) => transaction.description_pretty === key)
+    const t = transactions.find(
+      transaction => transaction.description_pretty === key
+    )
     if (!t) {
       return
     }
@@ -50,7 +52,11 @@ axios.defaults.headers['authorization'] = `Bearer ${MONEYTREE_TOKEN}`
       {
         transaction: {
           description_guest: value.description_guest,
-          amount, date, category_id: 85, claim_id: null, expense_type: 1
+          amount,
+          date,
+          category_id: 85,
+          claim_id: null,
+          expense_type: 1
         },
         upload_ids: []
       }
